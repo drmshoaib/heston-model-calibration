@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "Heston Model Calibration Using Numerical Optimisation"
+authors:
+  - family-names: "Shoaib"
+    given-names: "Muhammad"
+    name-particle: "Dr"
+    email: "safridi@gmail.com"
+version: "1.1.0"
+date-released: "2025-01-01"
+license: MIT
+repository-code: "https://github.com/drmshoaib/heston-model-calibration"
+abstract: >
+  A fully reproducible calibration framework for the Heston stochastic
+  volatility model. Implements Fourier-based European option pricing via the
+  Lewis (2001) formula, constrained nonlinear least-squares calibration using
+  scipy.optimize.least_squares, multi-start optimisation with reproducible
+  random seeds, and surface-level diagnostics including residual heatmaps and
+  maturity-slice smile plots. All experiments use synthetic data generated from
+  known ground-truth parameters.
+keywords:
+  - heston-model
+  - stochastic-volatility
+  - option-pricing
+  - quantitative-finance
+  - model-calibration
+  - numerical-optimization
+  - fourier-pricing
+  - derivatives-pricing
+  - python

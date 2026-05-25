@@ -1,13 +1,64 @@
 # Python cache
 __pycache__/
-*.pyc
+*.py[cod]
 *.pyo
+*.pyd
+*.pycache
 
-# OS files
-.DS_Store
-Thumbs.db
+# Distribution / packaging
+*.egg-info/
+dist/
+build/
+*.egg
+*.whl
+MANIFEST
+.installed.cfg
 
 # Virtual environments
 .venv/
 venv/
+env/
+ENV/
+.env
+
+# Testing & coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+*.coveragerc
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# IDE / editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Generated figures (kept in repo for documentation; add here to exclude)
+# fig_*.png
+
+# Generated LaTeX (kept in repo; uncomment to exclude)
+# tables/*.tex
+
+# MyPy / type-checking caches
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.ruff_cache/
+
+# Profiling
+*.prof
 
