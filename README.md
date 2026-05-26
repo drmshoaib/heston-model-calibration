@@ -113,7 +113,7 @@ where $\hat\sigma_i(\theta)$ is the model-implied IV, $\sigma_i^{\text{mkt}}$ is
 ## Calibration Workflow
 
 ```mermaid
-flowchart LR
+flowchart TB
     A[Synthetic market data\nK × T grid, known params] --> B[Heston pricing engine\nLewis 2001 Fourier]
     B --> C[IV inversion\nscipy.brentq]
     C --> D[Vega-weighted\ncalibration objective]
