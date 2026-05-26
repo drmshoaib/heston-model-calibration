@@ -95,10 +95,9 @@ $$
 
 **Pricing** uses the **Lewis (2001) Fourier inversion**:
 
-$$
-C(S_0, K, T, r) = S_0 - \frac{\sqrt{S_0 K}\,e^{-rT}}{\pi} \int_0^\infty \operatorname{Re}\!\left[\frac{e^{-iu\log(K/S_0)}\,\varphi(u - \tfrac{1}{2}i;\,T)}{u^2 + \tfrac{1}{4}}\right] du
-$$
-
+```math
+C(S_0, K, T, r) = S_0 - \frac{\sqrt{S_0 K}\,e^{-rT}}{\pi} \int_0^\infty \text{Re}\!\left[\frac{e^{-iu\log(K/S_0)}\,\varphi(u - \tfrac{1}{2}i;\,T)}{u^2 + \tfrac{1}{4}}\right] du
+```
 where $\varphi(u;\,T)$ is the Heston characteristic function of $\log S_T$.
 
 **Calibration** minimises the vega-weighted implied volatility objective:
