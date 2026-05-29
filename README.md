@@ -101,7 +101,7 @@ Pricing uses the Lewis (2001) Fourier inversion formula, with the Heston charact
 $$
 C(S_0, K, T, r) = S_0 - \frac{\sqrt{S_0K}e^{-rT}}{\pi}
 \int_0^\infty
-\operatorname{Re}\left[
+\mathrm{Re}\left[
 \frac{e^{-iu\log(K/S_0)}\varphi(u - \frac{1}{2}i;T)}
 {u^2 + \frac{1}{4}}
 \right]du
