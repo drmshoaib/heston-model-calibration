@@ -14,16 +14,25 @@ This repository implements a reproducible Heston calibration workflow for option
 ## At a Glance
 
 | Area | Details |
-| --- | --- |
+|---|---|
 | Domain | Quantitative finance / option pricing |
 | Model | Heston stochastic volatility model |
-| Core methods | Fourier pricing, numerical optimisation, calibration diagnostics |
-| Outputs | Calibrated parameters, pricing errors, diagnostic plots, reproducible LaTeX tables |
-| Intended use | Research/portfolio project, not a trading or investment system |
+| Core methods | Fourier pricing, constrained least-squares optimisation, multi-start calibration, diagnostics |
+| Outputs | Calibrated parameters, pricing errors, residual heatmaps, smile plots, reproducible reports |
+| Intended use | Research/portfolio implementation, not a trading or investment system |
 
 ## Problem
 
 Option markets imply a volatility surface that changes across strike and maturity. A constant-volatility Black-Scholes model cannot capture common features such as skew, smile, and term-structure effects. The Heston model introduces stochastic variance, but calibration is numerically delicate: parameters can be weakly identified, objective functions may be unstable, and good diagnostics are essential.
+
+| Challenge | How it is handled here |
+|---|---|
+| Complex branch cuts in the characteristic function | Gatheral / Little Trap convention with branch enforcement |
+| Non-convex, multi-modal objective | Multi-start calibration with reproducible random seeds |
+| IV inversion near arbitrage bounds | `scipy.optimize.brentq` with bracket validation |
+| Singular or near-singular Jacobian | Trust Region Reflective algorithm with parameter bounds |
+| Parameter non-uniqueness | Surface-level diagnostics prioritised over exact parameter recovery |
+| Numerical fragility in the calibration loop | NaN-safe objective with penalties for failed IV inversions |
 
 ## Solution
 
@@ -59,29 +68,38 @@ For a fast technical review:
 
 The Heston model specifies joint dynamics for the asset price \(S_t\) and instantaneous variance \(v_t\):
 
-```math
-dS_t = r S_t dt + \sqrt{v_t} S_t dW_t^S
-```
+$$
+dS_t = r S_t\,dt + \sqrt{v_t} S_t\,dW_t^S
+$$
 
-```math
-dv_t = \kappa(\theta - v_t)dt + \sigma \sqrt{v_t} dW_t^v
-```
+$$
+dv_t = \kappa(\theta - v_t)\,dt + \sigma\sqrt{v_t}\,dW_t^v
+$$
 
-```math
-\operatorname{corr}(dW_t^S, dW_t^v) = \rho
-```
+$$
+d\langle W^S, W^v \rangle_t = \rho\,dt
+$$
 
-Parameter interpretation:
+Heston parameter definitions:
 
-| Parameter | Meaning |
-| --- | --- |
-| `v0` | Initial variance |
-| `kappa` | Mean reversion speed |
-| `theta` | Long-run variance |
-| `sigma` | Volatility of variance |
-| `rho` | Correlation between asset and variance shocks |
+| Symbol | Parameter | Meaning |
+|---|---|---|
+| \(v_0\) | `v0` | Initial variance |
+| \(\kappa\) | `kappa` | Mean reversion speed |
+| \(\theta\) | `theta` | Long-run variance |
+| \(\sigma\) | `sigma` | Volatility of variance |
+| \(\rho\) | `rho` | Correlation between asset and variance shocks |
 
 Pricing uses the Lewis (2001) Fourier inversion formula, with the Heston characteristic function evaluated using the Gatheral/"Little Trap" branch convention.
+
+$$
+C(S_0, K, T, r) = S_0 - \frac{\sqrt{S_0K}e^{-rT}}{\pi}
+\int_0^\infty
+\operatorname{Re}\left[
+\frac{e^{-iu\log(K/S_0)}\varphi(u - \frac{1}{2}i;T)}
+{u^2 + \frac{1}{4}}
+\right]du
+$$
 
 ## Calibration Workflow
 
@@ -206,7 +224,7 @@ The multi-start plot shows the drop from random initial costs to converged objec
 The main experiment uses a noiseless synthetic implied-volatility surface generated from known Heston parameters. This is useful for testing numerical behaviour independently of market microstructure noise.
 
 | Item | Value |
-| --- | --- |
+|---|---|
 | Spot | 100 |
 | Rate | 1% |
 | Strike grid | 70 to 130, 15 strikes |
@@ -215,10 +233,20 @@ The main experiment uses a noiseless synthetic implied-volatility surface genera
 | Multi-start seed | 42 |
 | Starts | 5 |
 
+### Ground-Truth Parameters
+
+| Parameter | Symbol | True value |
+|---|---|---:|
+| Initial variance | \(v_0\) | 0.0400 |
+| Mean reversion speed | \(\kappa\) | 1.5000 |
+| Long-run variance | \(\theta\) | 0.0400 |
+| Volatility of variance | \(\sigma\) | 0.5000 |
+| Correlation | \(\rho\) | -0.7000 |
+
 ### Parameter Recovery
 
 | Parameter | True | Calibrated | Absolute diff |
-| --- | ---: | ---: | ---: |
+|---|---:|---:|---:|
 | `v0` | 0.0400 | 0.0399 | 1.0e-04 |
 | `kappa` | 1.5000 | 1.4989 | 1.1e-03 |
 | `theta` | 0.0400 | 0.0401 | 1.0e-04 |
@@ -230,7 +258,7 @@ Parameter recovery this close to ground truth is expected only in a noiseless sy
 ### Implied Volatility Fit Metrics
 
 | Metric | Value |
-| --- | ---: |
+|---|---:|
 | IV RMSE | 9.3e-08 |
 | IV MAE | < 1e-07 |
 | Max absolute IV error | < 1e-06 |
@@ -240,7 +268,7 @@ These errors are at numerical-integration scale for the synthetic experiment, no
 ### Calibration Diagnostics
 
 | Quantity | Value |
-| --- | --- |
+|---|---|
 | Optimisation algorithm | scipy TRF / `scipy.optimize.least_squares` |
 | Function evaluations to convergence | 7 |
 | Final cost | 3.6e-17 |
@@ -273,11 +301,11 @@ Runtime in calibration is dominated by implied-volatility inversion for each quo
 ## Limitations
 
 - This is a research/portfolio implementation, not a production trading system.
-- The main experiments use synthetic, noiseless data rather than live market option chains.
-- Calibration quality depends on data quality, initial guesses, objective choice, parameter bounds, and numerical settings.
-- Heston parameters may be weakly identified for sparse or noisy option surfaces.
-- The implementation assumes a flat interest rate and does not model dividends or term structures.
+- Calibration quality depends on data quality, initial guesses, objective choice, and numerical settings.
+- Heston parameters may be weakly identified for sparse, noisy, or realistic option surfaces.
 - Results should be interpreted as model diagnostics and research outputs, not trading advice.
+- The main experiments use synthetic, noiseless data rather than live market option chains.
+- The implementation assumes a flat interest rate and does not model dividends or term structures.
 
 ## Portfolio Signal
 
