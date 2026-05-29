@@ -9,6 +9,12 @@
 
 This repository implements a reproducible Heston calibration workflow for option pricing research. It combines characteristic-function pricing, parameter calibration, diagnostic plots, and robustness checks to make volatility-surface fitting more transparent and auditable.
 
+<p align="center">
+  <img src="docs/assets/heston_calibration_overview.png" alt="Heston calibration diagnostic overview" width="850">
+</p>
+
+> Example diagnostic output from the synthetic calibration experiment, showing the calibrated Heston surface fit and residual structure across the option grid.
+
 *Accompanying technical note:* [Heston Model Calibration Using Numerical Optimisation](<Heston Model Calibration Using Numerical Optimisation.pdf>) - Dr. Muhammad Shoaib.
 
 ## At a Glance
